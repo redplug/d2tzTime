@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec
+venv/
+.venv/
+env/
+
+# 설정 파일 (토큰 포함 → 절대 커밋 금지)
+config.json
+
+# PyInstaller 아티팩트
+*.manifest
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
