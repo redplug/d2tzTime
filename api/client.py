@@ -136,7 +136,12 @@ def fetch_terror_zone(token: str) -> TZInfo:
 
 # ────────────────────────────── 내부 헬퍼 ────────────────────────────────────
 
-def _next_hour_timestamp() -> float:
-    """다음 정각의 Unix timestamp를 반환합니다 (공포구역은 매 정각 갱신)."""
+def _next_slot_timestamp() -> float:
+    """다음 정각 또는 30분 시점의 Unix timestamp를 반환합니다.
+    공포구역은 매 :00과 :30에 갱신됩니다.
+    """
     now = time.time()
-    return (int(now // 3600) + 1) * 3600
+    # 현재 분(초 단위)
+    slot_sec = 30 * 60  # 1800초
+    current_slot = int(now // slot_sec)
+    return (current_slot + 1) * slot_sec
