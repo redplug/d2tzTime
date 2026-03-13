@@ -44,7 +44,6 @@ class SettingsDialog(tk.Toplevel):
         style.configure("Dark.TLabel", background=BG, foreground=FG, font=("Segoe UI", 9))
         style.configure("Title.TLabel", background=BG, foreground=ACCENT, font=("Segoe UI", 11, "bold"))
         style.configure("Dark.TCheckbutton", background=BG, foreground=FG, font=("Segoe UI", 9))
-        style.configure("Dark.TRadiobutton", background=BG, foreground=FG, font=("Segoe UI", 9))
         style.configure(
             "Accent.TButton",
             background=ACCENT, foreground="#1a1a2e",
@@ -72,41 +71,18 @@ class SettingsDialog(tk.Toplevel):
             row=0, column=0, columnspan=2, sticky="w", pady=(0, 12)
         )
 
-        # ── API 소스 선택 ──────────────────────────────────────────────
-        ttk.Label(frame, text="API 소스", style="Dark.TLabel").grid(
-            row=1, column=0, sticky="w"
-        )
-        self._api_source = tk.StringVar(value=self.cfg.get("api_source", "d2tz"))
-        src_frame = ttk.Frame(frame, style="Dark.TFrame")
-        src_frame.grid(row=1, column=1, sticky="w")
-        ttk.Radiobutton(
-            src_frame, text="d2tz.info", variable=self._api_source,
-            value="d2tz", style="Dark.TRadiobutton",
-            command=self._on_source_change,
-        ).pack(side="left")
-        ttk.Radiobutton(
-            src_frame, text="d2runewizard.com", variable=self._api_source,
-            value="d2runewizard", style="Dark.TRadiobutton",
-            command=self._on_source_change,
-        ).pack(side="left", padx=(10, 0))
-        ttk.Radiobutton(
-            src_frame, text="d2emu.com", variable=self._api_source,
-            value="d2emu", style="Dark.TRadiobutton",
-            command=self._on_source_change,
-        ).pack(side="left", padx=(10, 0))
-
         # ── 토큰 입력 ─────────────────────────────────────────────────
-        self._token_label = ttk.Label(frame, text="API 토큰", style="Dark.TLabel")
-        self._token_label.grid(row=2, column=0, sticky="w", **pad)
+        ttk.Label(frame, text="API 토큰", style="Dark.TLabel").grid(
+            row=1, column=0, sticky="w", **pad
+        )
 
-        token_key = self._get_token_key(self._api_source.get())
-        self._token_var = tk.StringVar(value=self.cfg.get(token_key, ""))
+        self._token_var = tk.StringVar(value=self.cfg.get("token_d2tz", ""))
         self._token_entry = tk.Entry(
             frame, textvariable=self._token_var, width=36,
             bg=ENTRY_BG, fg=FG, insertbackground=FG,
             relief="flat", font=("Consolas", 9), show="*",
         )
-        self._token_entry.grid(row=2, column=1, sticky="ew", **pad)
+        self._token_entry.grid(row=1, column=1, sticky="ew", **pad)
 
         # 토큰 표시/숨기기 토글
         self._show_token = tk.BooleanVar(value=False)
@@ -117,41 +93,40 @@ class SettingsDialog(tk.Toplevel):
             activebackground=BG, activeforeground=FG,
             relief="flat", font=("Segoe UI", 8),
         )
-        show_btn.grid(row=2, column=2, padx=2)
+        show_btn.grid(row=1, column=2, padx=2)
 
-        # 토큰 안내 링크 표시
-        src = self._api_source.get()
-        link_text = self._get_token_hint(src)
-        self._token_hint = ttk.Label(frame, text=link_text, style="Dark.TLabel",
-                                      foreground="#888", font=("Segoe UI", 8))
-        self._token_hint.grid(row=3, column=1, sticky="w", padx=14, pady=(0, 4))
+        # 토큰 안내
+        ttk.Label(
+            frame, text="👉 d2tz.info/api 에서 Google Form으로 신청 (무료)",
+            style="Dark.TLabel", foreground="#888", font=("Segoe UI", 8),
+        ).grid(row=2, column=1, sticky="w", padx=14, pady=(0, 4))
 
         ttk.Separator(frame, orient="horizontal").grid(
-            row=4, column=0, columnspan=3, sticky="ew", pady=8
+            row=3, column=0, columnspan=3, sticky="ew", pady=8
         )
 
         # ── 언어 선택 ──────────────────────────────────────────────────
         ttk.Label(frame, text="구역명 표시", style="Dark.TLabel").grid(
-            row=5, column=0, sticky="w"
+            row=4, column=0, sticky="w"
         )
         self._language = tk.StringVar(value=self.cfg.get("language", "ko"))
         lang_frame = ttk.Frame(frame, style="Dark.TFrame")
-        lang_frame.grid(row=5, column=1, sticky="w")
+        lang_frame.grid(row=4, column=1, sticky="w")
         ttk.Radiobutton(
             lang_frame, text="한글", variable=self._language,
-            value="ko", style="Dark.TRadiobutton",
+            value="ko", style="Dark.TCheckbutton",
         ).pack(side="left")
         ttk.Radiobutton(
             lang_frame, text="English", variable=self._language,
-            value="en", style="Dark.TRadiobutton",
+            value="en", style="Dark.TCheckbutton",
         ).pack(side="left", padx=(10, 0))
 
         # ── 투명도 슬라이더 ───────────────────────────────────────────
         ttk.Label(frame, text="투명도", style="Dark.TLabel").grid(
-            row=6, column=0, sticky="w", **pad
+            row=5, column=0, sticky="w", **pad
         )
         alpha_frame = ttk.Frame(frame, style="Dark.TFrame")
-        alpha_frame.grid(row=6, column=1, sticky="ew")
+        alpha_frame.grid(row=5, column=1, sticky="ew")
         self._alpha = tk.DoubleVar(value=self.cfg.get("alpha", 0.85))
         alpha_slider = ttk.Scale(
             alpha_frame, from_=0.1, to=1.0, variable=self._alpha,
@@ -169,22 +144,22 @@ class SettingsDialog(tk.Toplevel):
         ttk.Checkbutton(
             frame, text="항상 위 (Always on Top)",
             variable=self._always_on_top, style="Dark.TCheckbutton",
-        ).grid(row=7, column=0, columnspan=2, sticky="w", padx=14)
+        ).grid(row=6, column=0, columnspan=2, sticky="w", padx=14)
 
         # ── Lock Position ─────────────────────────────────────────────
         self._lock_position = tk.BooleanVar(value=self.cfg.get("lock_position", False))
         ttk.Checkbutton(
             frame, text="위치 고정 (Lock Position)",
             variable=self._lock_position, style="Dark.TCheckbutton",
-        ).grid(row=8, column=0, columnspan=2, sticky="w", padx=14, pady=(2, 0))
+        ).grid(row=7, column=0, columnspan=2, sticky="w", padx=14, pady=(2, 0))
 
         ttk.Separator(frame, orient="horizontal").grid(
-            row=9, column=0, columnspan=3, sticky="ew", pady=10
+            row=8, column=0, columnspan=3, sticky="ew", pady=10
         )
 
         # ── 저장 / 취소 버튼 ──────────────────────────────────────────
         btn_frame = ttk.Frame(frame, style="Dark.TFrame")
-        btn_frame.grid(row=10, column=0, columnspan=3, sticky="e")
+        btn_frame.grid(row=9, column=0, columnspan=3, sticky="e")
         ttk.Button(btn_frame, text="저장", style="Accent.TButton", command=self._save).pack(
             side="right", padx=(6, 0), ipadx=10
         )
@@ -203,31 +178,12 @@ class SettingsDialog(tk.Toplevel):
 
     # ── 콜백 ─────────────────────────────────────────────────────────────
 
-    @staticmethod
-    def _get_token_key(src: str) -> str:
-        return {"d2tz": "token_d2tz", "d2runewizard": "token_d2rw", "d2emu": "token_d2emu"}.get(src, "token_d2tz")
-
-    @staticmethod
-    def _get_token_hint(src: str) -> str:
-        return {
-            "d2tz": "👉 d2tz.info/api 에서 Google Form으로 신청 (무료)",
-            "d2runewizard": "👉 d2runewizard.com/integration 에서 발급",
-            "d2emu": "👉 d2emu Discord에서 발급",
-        }.get(src, "")
-
-    def _on_source_change(self) -> None:
-        src = self._api_source.get()
-        # 소스 변경 시 해당 소스의 토큰으로 전환
-        self._token_var.set(self.cfg.get(self._get_token_key(src), ""))
-        self._token_hint.configure(text=self._get_token_hint(src))
-
     def _toggle_token_visibility(self) -> None:
         self._token_entry.configure(show="" if self._show_token.get() else "*")
 
     def _on_alpha_change(self, *_) -> None:
         val = self._alpha.get()
         self._alpha_label.configure(text=f"{val:.0%}")
-        # 부모 창에 즉시 투명도 반영 (실시간 미리보기)
         try:
             self.master.wm_attributes("-alpha", val)
         except Exception:
@@ -239,18 +195,13 @@ class SettingsDialog(tk.Toplevel):
             messagebox.showwarning(
                 "토큰 필요",
                 "API 토큰을 입력해주세요.\n\n"
-                "d2runewizard.com/integration 또는\n"
-                "d2emu Discord에서 발급받을 수 있습니다.",
+                "d2tz.info/api 에서 Google Form으로 신청할 수 있습니다.",
                 parent=self,
             )
             return
 
-        src = self._api_source.get()
-        # 현재 소스의 토큰 저장, 다른 소스는 기존 값 유지
-        self.cfg[self._get_token_key(src)] = token
-
+        self.cfg["token_d2tz"] = token
         self.cfg.update({
-            "api_source": src,
             "language": self._language.get(),
             "alpha": round(self._alpha.get(), 2),
             "always_on_top": self._always_on_top.get(),

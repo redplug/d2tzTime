@@ -14,9 +14,7 @@ CONFIG_PATH = Path(os.path.dirname(os.path.abspath(__file__))).parent / "config.
 _XOR_KEY = b"D2TZ_OVL_K3Y"
 
 DEFAULT_CONFIG = {
-    "api_source": "d2runewizard",   # "d2runewizard" | "d2emu"
-    "token_d2rw": "",               # d2runewizard 토큰 (난독화 저장)
-    "token_d2emu": "",              # d2emu 토큰 (난독화 저장)
+    "token_d2tz": "",               # d2tz.info 토큰 (난독화 저장)
     "x": 100,                       # 창 X 위치
     "y": 100,                       # 창 Y 위치
     "alpha": 0.85,                  # 투명도 (0.1 ~ 1.0)
@@ -56,12 +54,10 @@ def load_config() -> dict:
     try:
         with CONFIG_PATH.open("r", encoding="utf-8") as f:
             raw = json.load(f)
-        # 기본값과 병합 (새 키가 생겼을 때 대비)
         cfg = dict(DEFAULT_CONFIG)
         cfg.update(raw)
         # 토큰 복호화
-        cfg["token_d2rw"] = _deobfuscate(cfg.get("token_d2rw", ""))
-        cfg["token_d2emu"] = _deobfuscate(cfg.get("token_d2emu", ""))
+        cfg["token_d2tz"] = _deobfuscate(cfg.get("token_d2tz", ""))
         return cfg
     except Exception:
         return dict(DEFAULT_CONFIG)
@@ -70,7 +66,6 @@ def load_config() -> dict:
 def save_config(cfg: dict) -> None:
     """설정을 config.json에 저장합니다. 토큰은 난독화하여 저장."""
     to_save = dict(cfg)
-    to_save["token_d2rw"] = _obfuscate(cfg.get("token_d2rw", ""))
-    to_save["token_d2emu"] = _obfuscate(cfg.get("token_d2emu", ""))
+    to_save["token_d2tz"] = _obfuscate(cfg.get("token_d2tz", ""))
     with CONFIG_PATH.open("w", encoding="utf-8") as f:
         json.dump(to_save, f, indent=2, ensure_ascii=False)
