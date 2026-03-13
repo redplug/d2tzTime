@@ -76,14 +76,19 @@ class SettingsDialog(tk.Toplevel):
         ttk.Label(frame, text="API 소스", style="Dark.TLabel").grid(
             row=1, column=0, sticky="w"
         )
-        self._api_source = tk.StringVar(value=self.cfg.get("api_source", "d2runewizard"))
+        self._api_source = tk.StringVar(value=self.cfg.get("api_source", "d2tz"))
         src_frame = ttk.Frame(frame, style="Dark.TFrame")
         src_frame.grid(row=1, column=1, sticky="w")
+        ttk.Radiobutton(
+            src_frame, text="d2tz.info", variable=self._api_source,
+            value="d2tz", style="Dark.TRadiobutton",
+            command=self._on_source_change,
+        ).pack(side="left")
         ttk.Radiobutton(
             src_frame, text="d2runewizard.com", variable=self._api_source,
             value="d2runewizard", style="Dark.TRadiobutton",
             command=self._on_source_change,
-        ).pack(side="left")
+        ).pack(side="left", padx=(10, 0))
         ttk.Radiobutton(
             src_frame, text="d2emu.com", variable=self._api_source,
             value="d2emu", style="Dark.TRadiobutton",
@@ -94,7 +99,7 @@ class SettingsDialog(tk.Toplevel):
         self._token_label = ttk.Label(frame, text="API 토큰", style="Dark.TLabel")
         self._token_label.grid(row=2, column=0, sticky="w", **pad)
 
-        token_key = "token_d2rw" if self._api_source.get() == "d2runewizard" else "token_d2emu"
+        token_key = self._get_token_key(self._api_source.get())
         self._token_var = tk.StringVar(value=self.cfg.get(token_key, ""))
         self._token_entry = tk.Entry(
             frame, textvariable=self._token_var, width=36,
@@ -116,7 +121,7 @@ class SettingsDialog(tk.Toplevel):
 
         # 토큰 안내 링크 표시
         src = self._api_source.get()
-        link_text = "👉 d2runewizard.com/integration 에서 발급" if src == "d2runewizard" else "👉 d2emu Discord에서 발급"
+        link_text = self._get_token_hint(src)
         self._token_hint = ttk.Label(frame, text=link_text, style="Dark.TLabel",
                                       foreground="#888", font=("Segoe UI", 8))
         self._token_hint.grid(row=3, column=1, sticky="w", padx=14, pady=(0, 4))
@@ -198,23 +203,35 @@ class SettingsDialog(tk.Toplevel):
 
     # ── 콜백 ─────────────────────────────────────────────────────────────
 
+    @staticmethod
+    def _get_token_key(src: str) -> str:
+        return {"d2tz": "token_d2tz", "d2runewizard": "token_d2rw", "d2emu": "token_d2emu"}.get(src, "token_d2tz")
+
+    @staticmethod
+    def _get_token_hint(src: str) -> str:
+        return {
+            "d2tz": "👉 d2tz.info/api 에서 Google Form으로 신청 (무료)",
+            "d2runewizard": "👉 d2runewizard.com/integration 에서 발급",
+            "d2emu": "👉 d2emu Discord에서 발급",
+        }.get(src, "")
+
     def _on_source_change(self) -> None:
         src = self._api_source.get()
         # 소스 변경 시 해당 소스의 토큰으로 전환
-        token_key = "token_d2rw" if src == "d2runewizard" else "token_d2emu"
-        self._token_var.set(self.cfg.get(token_key, ""))
-        link_text = (
-            "👉 d2runewizard.com/integration 에서 발급"
-            if src == "d2runewizard"
-            else "👉 d2emu Discord에서 발급"
-        )
-        self._token_hint.configure(text=link_text)
+        self._token_var.set(self.cfg.get(self._get_token_key(src), ""))
+        self._token_hint.configure(text=self._get_token_hint(src))
 
     def _toggle_token_visibility(self) -> None:
         self._token_entry.configure(show="" if self._show_token.get() else "*")
 
     def _on_alpha_change(self, *_) -> None:
-        self._alpha_label.configure(text=f"{self._alpha.get():.0%}")
+        val = self._alpha.get()
+        self._alpha_label.configure(text=f"{val:.0%}")
+        # 부모 창에 즉시 투명도 반영 (실시간 미리보기)
+        try:
+            self.master.wm_attributes("-alpha", val)
+        except Exception:
+            pass
 
     def _save(self) -> None:
         token = self._token_var.get().strip()
@@ -230,10 +247,7 @@ class SettingsDialog(tk.Toplevel):
 
         src = self._api_source.get()
         # 현재 소스의 토큰 저장, 다른 소스는 기존 값 유지
-        if src == "d2runewizard":
-            self.cfg["token_d2rw"] = token
-        else:
-            self.cfg["token_d2emu"] = token
+        self.cfg[self._get_token_key(src)] = token
 
         self.cfg.update({
             "api_source": src,

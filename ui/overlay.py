@@ -51,7 +51,8 @@ class OverlayApp(tk.Tk):
         self._apply_config()
 
         # 첫 실행: 토큰이 없으면 설정창 팝업
-        token_key = "token_d2rw" if self.cfg["api_source"] == "d2runewizard" else "token_d2emu"
+        token_key_map = {"d2tz": "token_d2tz", "d2runewizard": "token_d2rw", "d2emu": "token_d2emu"}
+        token_key = token_key_map.get(self.cfg.get("api_source", "d2tz"), "token_d2tz")
         if not self.cfg.get(token_key):
             self.after(200, self._open_settings_required)
         else:
@@ -243,8 +244,9 @@ class OverlayApp(tk.Tk):
         self._current_zone_label.configure(text="갱신 중...", fg=DIM_COLOR)
         self._error_label.configure(text="")
 
-        src = self.cfg.get("api_source", "d2runewizard")
-        token_key = "token_d2rw" if src == "d2runewizard" else "token_d2emu"
+        src = self.cfg.get("api_source", "d2tz")
+        token_key_map = {"d2tz": "token_d2tz", "d2runewizard": "token_d2rw", "d2emu": "token_d2emu"}
+        token_key = token_key_map.get(src, "token_d2tz")
         token = self.cfg.get(token_key, "")
 
         def _do_fetch():
