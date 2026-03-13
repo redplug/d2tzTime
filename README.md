@@ -17,19 +17,13 @@
 - **투명도 조절** / **Always on Top** / **위치 고정**
 - **우클릭 메뉴**로 설정 및 새로고침
 - API 토큰은 `config.json`에 안전하게 난독화 저장
+- API 없이도 동작 (공개 데이터 활용)
 
 ---
 
 ## 🚀 빠른 시작
 
-### 1. API 토큰 발급
-
-| 소스 | 발급 방법 |
-|------|----------|
-| **d2runewizard.com** (권장) | [d2runewizard.com/integration](https://d2runewizard.com/integration) 에서 신청 |
-| **d2emu.com** | [Discord](https://discord.gg/yeFkxYdpru) 서버에서 신청 |
-
-### 2. 실행
+### 1. 실행
 
 #### 방법 A: exe 파일 사용 (비개발자)
 ```
@@ -49,9 +43,8 @@ pip install -r requirements.txt
 python app.py
 ```
 
-### 3. 첫 실행
-- 토큰이 없으면 자동으로 **설정 창**이 팝업됩니다
-- API 소스 선택 후 토큰 입력 → 저장
+### 2. 첫 실행
+- 실행 시 자동으로 공포구역 정보를 표시합니다
 
 ---
 
@@ -80,9 +73,8 @@ pyinstaller --onefile --noconsole --name D2TZ_Tracker --add-data "core;core" --a
 
 ## ⚠️ 주의사항
 
-- `config.json`에는 난독화된 API 토큰이 저장됩니다. **절대 공유하지 마세요** (`.gitignore`로 제외됨)
-- API 토큰은 d2runewizard/d2emu의 이용약관을 준수하여 사용하세요
-- 공포구역 정보는 `d2runewizard.com` 또는 `d2emu.com` 서버에 의존합니다
+- `config.json`에는 설정이 저장됩니다. **절대 공유하지 마세요** (`.gitignore`로 제외됨)
+- 공포구역 정보는 외부 공개 데이터를 활용합니다
 
 ---
 
