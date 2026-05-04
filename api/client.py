@@ -54,7 +54,7 @@ def _fetch_d2tz(token: str) -> TZInfo:
 
         current_zone = "불명"
         next_zone = "불명"
-        update_ts = _next_hour_timestamp()
+        update_ts = _next_slot_timestamp()
 
         if isinstance(data, list) and data:
             current_entry = None
@@ -93,7 +93,7 @@ def _fetch_d2tz(token: str) -> TZInfo:
                 current_zone = zones[0]
             elif isinstance(zones, str):
                 current_zone = zones
-            update_ts = float(data.get("end_time", _next_hour_timestamp()))
+            update_ts = float(data.get("end_time", _next_slot_timestamp()))
 
         return TZInfo(
             current_zone=current_zone,
